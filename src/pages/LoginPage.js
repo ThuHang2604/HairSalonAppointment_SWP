@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { MDBContainer, MDBInput, MDBBtn } from 'mdb-react-ui-kit';
+import { Container, TextField, Button, Typography, Box } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import useAxios from '@/hooks/useAxios';
 import useAuth from '@/hooks/useAuth';
@@ -30,9 +30,11 @@ function LoginPage() {
   };
 
   const handleSubmit = async (values) => {
+    console.log('Form submitted with values:', values);
+
     try {
       setIsLoading(true);
-      const response = await axios.post(process.env.REACT_APP_LOGIN, {
+      const response = await axios.post('/users/Login', {
         username: values.username,
         password: values.password,
       });
@@ -42,18 +44,11 @@ function LoginPage() {
         role: response.data.data.role,
       };
 
-      // sessionStorage.setItem('auth', JSON.stringify(auth));
       login(auth);
 
-      // Navigate with role
-      if (
-        auth.role.includes('admin') ||
-        auth.role.includes('manager') ||
-        auth.role.includes('staff') ||
-        auth.role.includes('stylist')
-      ) {
+      if (auth.role.includes('admin') || auth.role.includes('manager')) {
         navigate('/dashboard', { replace: true });
-      } else if (auth.role.includes('member')) {
+      } else if (auth.role.includes('customer')) {
         navigate('/', { replace: true });
       } else {
         toast.error('Tài khoản không được phép đăng nhập vào hệ thống');
@@ -66,47 +61,70 @@ function LoginPage() {
   };
 
   return (
-    <MDBContainer className="p-3 my-5 d-flex flex-column w-50">
-      <h2 className="fw-bold mb-5">Sign In</h2>
+    <Container maxWidth="sm">
+      <Box mt={5} p={3}>
+        <Typography variant="h4" mb={5} fontWeight="bold">
+          Sign In
+        </Typography>
 
-      <Formik initialValues={INITIAL_FORM_STATE} validationSchema={FORM_VALIDATION} onSubmit={handleSubmit}>
-        {({ isSubmitting }) => (
-          <Form>
-            <MDBInput wrapperClass="mb-4" label="Username" id="form1" type="text" name="username" as={Field} />
-            <ErrorMessage name="username" component="div" className="text-danger mb-2" />
+        <Formik
+          initialValues={INITIAL_FORM_STATE}
+          validationSchema={FORM_VALIDATION}
+          onSubmit={handleSubmit}
+          validateOnChange={true}
+          validateOnBlur={true}
+        >
+          {({ values, handleChange, isSubmitting }) => (
+            <Form>
+              <Field name="username">
+                {({ field }) => <TextField fullWidth margin="normal" label="Username" variant="outlined" {...field} />}
+              </Field>
+              <ErrorMessage name="username" component="div" className="text-danger" />
 
-            <MDBInput
-              wrapperClass="mb-4"
-              label="Password"
-              id="form2"
-              type={showPassword ? 'text' : 'password'}
-              name="password"
-              as={Field}
-            />
-            <ErrorMessage name="password" component="div" className="text-danger mb-2" />
+              <Field name="password">
+                {({ field }) => (
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    label="Password"
+                    variant="outlined"
+                    type={showPassword ? 'text' : 'password'}
+                    {...field}
+                  />
+                )}
+              </Field>
+              <ErrorMessage name="password" component="div" className="text-danger" />
 
-            <div className="d-flex justify-content-between mx-3 mb-4">
-              <Link to="/forgot-password">Forgot password?</Link>
-              <div onClick={handleClick} style={{ cursor: 'pointer' }}>
-                {showPassword ? 'Hide Password' : 'Show Password'}
-              </div>
-            </div>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+                <Link to="/forgot-password">Forgot password?</Link>
+                <Typography onClick={handleClick} sx={{ cursor: 'pointer' }} color="primary">
+                  {showPassword ? 'Hide Password' : 'Show Password'}
+                </Typography>
+              </Box>
 
-            <MDBBtn className="mb-4" type="submit" disabled={isLoading || isSubmitting}>
-              {isLoading ? 'Loading...' : 'Sign In'}
-            </MDBBtn>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={isLoading || isSubmitting}
+                sx={{ mt: 3 }}
+              >
+                {isLoading ? 'Loading...' : 'Sign In'}
+              </Button>
 
-            <div className="text-center">
-              <p>
-                Not a member? <Link to="/register">Register</Link>
-              </p>
-            </div>
+              <Box textAlign="center" mt={3}>
+                <Typography>
+                  Not a member? <Link to="/register">Register</Link>
+                </Typography>
+              </Box>
 
-            <ToastContainer position="top-right" autoClose={3000} />
-          </Form>
-        )}
-      </Formik>
-    </MDBContainer>
+              <ToastContainer position="top-right" autoClose={3000} />
+            </Form>
+          )}
+        </Formik>
+      </Box>
+    </Container>
   );
 }
 

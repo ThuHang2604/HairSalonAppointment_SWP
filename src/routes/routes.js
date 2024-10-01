@@ -46,6 +46,14 @@ const publicRoutes = [
   },
 ];
 
+const memberRoutes = [
+  {
+    title: 'Payment',
+    path: '/payment',
+    component: PaymentPage,
+  },
+];
+
 const adminRoutes = [
   {
     title: 'Dashboard',
@@ -54,4 +62,4 @@ const adminRoutes = [
   },
 ];
 
-export { publicRoutes, adminRoutes };
+export { publicRoutes, memberRoutes, adminRoutes };

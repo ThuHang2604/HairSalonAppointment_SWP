@@ -11,7 +11,7 @@ const Navbar = () => {
   const isAuthenticated = !!auth;
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#f26e3f', boxShadow: 'none', marginBottom: 5 }}>
+    <AppBar position="static" sx={{ backgroundColor: '#f26e3f', boxShadow: 'none' }}>
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         {/* Logo */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>

@@ -1,45 +1,54 @@
 import React from 'react';
-import { MDBBtn, MDBContainer, MDBCard, MDBCardBody, MDBInput, MDBRow, MDBCol, MDBCheckbox } from 'mdb-react-ui-kit';
+import { Container, TextField, Button, Card, CardContent, FormControlLabel, Box, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid';
 
 import './Register.css';
 
 function RegisterPage() {
   return (
-    <MDBContainer fluid className="my-2 d-flex justify-content-center align-items-center vh-100">
-      <MDBRow className="g-0 align-items-center w-100">
-        <MDBCol md="6" lg="5" className="d-flex justify-content-center">
-          <MDBCard
-            className="my-5 cascading-right w-100"
-            style={{ background: 'hsla(0, 0%, 100%, 0.55)', backdropFilter: 'blur(30px)' }}
+    <Container maxWidth={false} disableGutters>
+      <Grid container spacing={0} style={{ height: '100vh' }}>
+        {/* Form Section */}
+        <Grid item xs={12} md={6} display="flex" justifyContent="center" alignItems="center">
+          <Card
+            style={{
+              padding: '2rem',
+              maxWidth: '400px',
+              width: '100%',
+              background: 'hsla(0, 0%, 100%, 0.85)',
+              backdropFilter: 'blur(10px)',
+            }}
           >
-            <MDBCardBody className="p-5 shadow-5 text-center">
-              <h2 className="fw-bold mb-5">Sign up now</h2>
+            <CardContent>
+              <Typography variant="h4" mb={5} fontWeight="bold" gutterBottom>
+                Sign up now
+              </Typography>
+              <TextField fullWidth label="Username" margin="normal" />
+              <TextField fullWidth label="Phone number" margin="normal" />
+              <TextField fullWidth label="Password" type="password" margin="normal" />
 
-              <MDBInput wrapperClass="mb-4" label="Username" id="form3" type="username" />
-              <MDBInput wrapperClass="mb-4" label="Phone number" id="form3" type="phone" />
-              <MDBInput wrapperClass="mb-4" label="Password" id="form4" type="password" />
+              <Button fullWidth variant="contained" color="primary" size="large" style={{ marginTop: '1rem' }}>
+                Sign up
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
 
-              <div className="d-flex justify-content-center mb-4">
-                <MDBCheckbox name="flexCheck" value="" id="flexCheckDefault" label="Subscribe to our newsletter" />
-              </div>
-
-              <MDBBtn className="w-100 mb-4" size="md">
-                sign up
-              </MDBBtn>
-            </MDBCardBody>
-          </MDBCard>
-        </MDBCol>
-
-        <MDBCol md="6" lg="5" className="d-none d-md-block">
-          <img
+        {/* Image Section */}
+        <Grid item xs={false} md={6} style={{ height: '100vh' }}>
+          <Box
+            component="img"
+            sx={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+            alt="Salon"
             src="https://i.pinimg.com/564x/82/bd/8b/82bd8b8197a1a7a95f7a4f7440b284cf.jpg"
-            className="w-100 rounded-4 shadow-4"
-            alt=""
-            fluid
           />
-        </MDBCol>
-      </MDBRow>
-    </MDBContainer>
+        </Grid>
+      </Grid>
+    </Container>
   );
 }
 
