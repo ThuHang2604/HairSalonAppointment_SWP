@@ -5,15 +5,18 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import useAxios from '@/hooks/useAxios';
-import useAuth from '@/hooks/useAuth';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../redux/slice/authSlice';
+import { useEffect } from 'react';
 
 function LoginPage() {
   const navigate = useNavigate();
-  const axios = useAxios();
-  const { login } = useAuth();
+  const dispatch = useDispatch();
+
+  // Lấy trạng thái từ Redux store
+  const { isLoading, isAuthenticated, error } = useSelector((state) => state.auth);
+
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const INITIAL_FORM_STATE = {
     username: '',
@@ -30,35 +33,23 @@ function LoginPage() {
   };
 
   const handleSubmitLogin = async (values) => {
-    console.log('Form submitted with values:', values);
-
-    try {
-      setIsLoading(true);
-      const response = await axios.post('/users/Login', {
-        username: values.username,
-        password: values.password,
-      });
-
-      const auth = {
-        token: response.data.data.jwt,
-        role: response.data.data.role,
-      };
-
-      login(auth);
-
-      if (auth.role.includes('admin') || auth.role.includes('manager')) {
-        navigate('/dashboard', { replace: true });
-      } else if (auth.role.includes('customer')) {
-        navigate('/', { replace: true });
-      } else {
-        toast.error('Tài khoản không được phép đăng nhập vào hệ thống');
-      }
-    } catch (error) {
-      toast.error('Đăng nhập không thành công! Vui lòng kiểm tra lại thông tin.');
-    } finally {
-      setIsLoading(false);
-    }
+    // Gọi action loginUser với giá trị form
+    dispatch(loginUser(values));
   };
+
+  // Điều hướng khi đăng nhập thành công
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true }); // Điều hướng đến dashboard khi đăng nhập thành công
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Hiển thị lỗi đăng nhập nếu có
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   return (
     <Container maxWidth="sm">
