@@ -29,7 +29,7 @@ function LoginPage() {
     setShowPassword((prev) => !prev);
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmitLogin = async (values) => {
     console.log('Form submitted with values:', values);
 
     try {
@@ -70,7 +70,7 @@ function LoginPage() {
         <Formik
           initialValues={INITIAL_FORM_STATE}
           validationSchema={FORM_VALIDATION}
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmitLogin}
           validateOnChange={true}
           validateOnBlur={true}
         >
