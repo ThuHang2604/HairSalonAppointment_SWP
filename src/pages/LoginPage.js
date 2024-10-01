@@ -64,7 +64,7 @@ function LoginPage() {
     <Container maxWidth="sm">
       <Box mt={5} p={3}>
         <Typography variant="h4" mb={5} fontWeight="bold">
-          Sign In
+          Log In
         </Typography>
 
         <Formik
@@ -110,12 +110,12 @@ function LoginPage() {
                 disabled={isLoading || isSubmitting}
                 sx={{ mt: 3 }}
               >
-                {isLoading ? 'Loading...' : 'Sign In'}
+                {isLoading ? 'Loading...' : 'Log In'}
               </Button>
 
               <Box textAlign="center" mt={3}>
                 <Typography>
-                  Not a member? <Link to="/register">Register</Link>
+                  Not a member? <Link to="/register">Sign Up</Link>
                 </Typography>
               </Box>
 

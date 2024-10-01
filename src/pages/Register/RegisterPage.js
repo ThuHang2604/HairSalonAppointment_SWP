@@ -21,14 +21,14 @@ function RegisterPage() {
           >
             <CardContent>
               <Typography variant="h4" mb={5} fontWeight="bold" gutterBottom>
-                Sign up now
+                Sign Up Now
               </Typography>
               <TextField fullWidth label="Username" margin="normal" />
               <TextField fullWidth label="Phone number" margin="normal" />
               <TextField fullWidth label="Password" type="password" margin="normal" />
 
               <Button fullWidth variant="contained" color="primary" size="large" style={{ marginTop: '1rem' }}>
-                Sign up
+                Sign Up
               </Button>
             </CardContent>
           </Card>

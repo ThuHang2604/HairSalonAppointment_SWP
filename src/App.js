@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { publicRoutes, adminRoutes } from './routes/routes';
 import './App.css';
-import { ToastContainer } from 'react-toastify';
 
 import DefaultLayout from './layout/DefaultLayout';
 
@@ -49,8 +48,6 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-
-      <ToastContainer position="top-right" autoClose="3000" />
     </div>
   );
 }
