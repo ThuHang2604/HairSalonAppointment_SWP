@@ -33,18 +33,15 @@ function LoginPage() {
   };
 
   const handleSubmitLogin = async (values) => {
-    // Gọi action loginUser với giá trị form
     dispatch(loginUser(values));
   };
 
-  // Điều hướng khi đăng nhập thành công
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard', { replace: true }); // Điều hướng đến dashboard khi đăng nhập thành công
+      navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
-  // Hiển thị lỗi đăng nhập nếu có
   useEffect(() => {
     if (error) {
       toast.error(error);

@@ -4,25 +4,25 @@ import { setUserAuthToken } from '../authServices';
 
 export const loginUser = createAsyncThunk('auth/loginUser', async (credentials, { rejectWithValue }) => {
   try {
-    const response = await instance.post('/users/Login', {
+    const response = await instance.post('api/v1/users/Login', {
       username: credentials.username,
       password: credentials.password,
     });
+    console.log('Login response:', response);
     const { data } = response;
-
-    // Lưu token vào headers của Axios
-    setUserAuthToken(data.jwt);
+    console.log('data là', data.token);
+    setUserAuthToken(data.token);
 
     return data;
   } catch (error) {
-    // Xử lý lỗi
+    console.error('Error during login:', error);
     return rejectWithValue(error.response?.data || 'Login failed');
   }
 });
 
 export const registerUser = createAsyncThunk('auth/registerUser', async (userDetails, { rejectWithValue }) => {
   try {
-    const response = await instance.post('/users/Register', {
+    const response = await instance.post('api/v1/users/Register', {
       username: userDetails.username,
       password: userDetails.password,
       email: userDetails.email,
@@ -61,7 +61,7 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
-        state.token = action.payload.jwt;
+        state.token = action.payload.token;
         state.isAuthenticated = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
