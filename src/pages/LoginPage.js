@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
@@ -6,16 +6,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser } from '../redux/slice/authSlice';
-import { useEffect } from 'react';
+import { loginUser, logoutUser } from '../redux/slice/authSlice';
 
 function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Lấy trạng thái từ Redux store
   const { isLoading, isAuthenticated, error } = useSelector((state) => state.auth);
-
   const [showPassword, setShowPassword] = useState(false);
 
   const INITIAL_FORM_STATE = {
@@ -36,6 +33,11 @@ function LoginPage() {
     dispatch(loginUser(values));
   };
 
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    toast.success('Successfully logged out');
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/dashboard', { replace: true });
@@ -52,65 +54,75 @@ function LoginPage() {
     <Container maxWidth="sm">
       <Box mt={5} p={3}>
         <Typography variant="h4" mb={5} fontWeight="bold">
-          Log In
+          {isAuthenticated ? 'Welcome Back!' : 'Log In'}
         </Typography>
 
-        <Formik
-          initialValues={INITIAL_FORM_STATE}
-          validationSchema={FORM_VALIDATION}
-          onSubmit={handleSubmitLogin}
-          validateOnChange={true}
-          validateOnBlur={true}
-        >
-          {({ values, handleChange, isSubmitting }) => (
-            <Form>
-              <Field name="username">
-                {({ field }) => <TextField fullWidth margin="normal" label="Username" variant="outlined" {...field} />}
-              </Field>
-              <ErrorMessage name="username" component="div" className="text-danger" />
+        {!isAuthenticated ? (
+          <Formik
+            initialValues={INITIAL_FORM_STATE}
+            validationSchema={FORM_VALIDATION}
+            onSubmit={handleSubmitLogin}
+            validateOnChange={true}
+            validateOnBlur={true}
+          >
+            {({ values, handleChange, isSubmitting }) => (
+              <Form>
+                <Field name="username">
+                  {({ field }) => (
+                    <TextField fullWidth margin="normal" label="Username" variant="outlined" {...field} />
+                  )}
+                </Field>
+                <ErrorMessage name="username" component="div" className="text-danger" />
 
-              <Field name="password">
-                {({ field }) => (
-                  <TextField
-                    fullWidth
-                    margin="normal"
-                    label="Password"
-                    variant="outlined"
-                    type={showPassword ? 'text' : 'password'}
-                    {...field}
-                  />
-                )}
-              </Field>
-              <ErrorMessage name="password" component="div" className="text-danger" />
+                <Field name="password">
+                  {({ field }) => (
+                    <TextField
+                      fullWidth
+                      margin="normal"
+                      label="Password"
+                      variant="outlined"
+                      type={showPassword ? 'text' : 'password'}
+                      {...field}
+                    />
+                  )}
+                </Field>
+                <ErrorMessage name="password" component="div" className="text-danger" />
 
-              <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
-                <Link to="/forgot-password">Forgot password?</Link>
-                <Typography onClick={handleClick} sx={{ cursor: 'pointer' }} color="primary">
-                  {showPassword ? 'Hide Password' : 'Show Password'}
-                </Typography>
-              </Box>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+                  <Link to="/forgot-password">Forgot password?</Link>
+                  <Typography onClick={handleClick} sx={{ cursor: 'pointer' }} color="primary">
+                    {showPassword ? 'Hide Password' : 'Show Password'}
+                  </Typography>
+                </Box>
 
-              <Button
-                fullWidth
-                variant="contained"
-                color="primary"
-                type="submit"
-                disabled={isLoading || isSubmitting}
-                sx={{ mt: 3 }}
-              >
-                {isLoading ? 'Loading...' : 'Log In'}
-              </Button>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                  disabled={isLoading || isSubmitting}
+                  sx={{ mt: 3 }}
+                >
+                  {isLoading ? 'Loading...' : 'Log In'}
+                </Button>
 
-              <Box textAlign="center" mt={3}>
-                <Typography>
-                  Not a member? <Link to="/register">Sign Up</Link>
-                </Typography>
-              </Box>
+                <Box textAlign="center" mt={3}>
+                  <Typography>
+                    Not a member? <Link to="/register">Sign Up</Link>
+                  </Typography>
+                </Box>
 
-              <ToastContainer position="top-right" autoClose={3000} />
-            </Form>
-          )}
-        </Formik>
+                <ToastContainer position="top-right" autoClose={3000} />
+              </Form>
+            )}
+          </Formik>
+        ) : (
+          <Box>
+            <Button fullWidth variant="contained" color="secondary" onClick={handleLogout} sx={{ mt: 3 }}>
+              Log Out
+            </Button>
+          </Box>
+        )}
       </Box>
     </Container>
   );

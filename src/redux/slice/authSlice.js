@@ -20,6 +20,16 @@ export const loginUser = createAsyncThunk('auth/loginUser', async (credentials, 
   }
 });
 
+export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, { rejectWithValue }) => {
+  try {
+    setUserAuthToken(null);
+
+    return true;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || 'Logout failed');
+  }
+});
+
 export const registerUser = createAsyncThunk('auth/registerUser', async (userDetails, { rejectWithValue }) => {
   try {
     const response = await instance.post('api/v1/users/Register', {
@@ -49,6 +59,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
+      state.error = null;
       setUserAuthToken(null);
     },
   },
@@ -81,12 +92,28 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       });
+
+    builder
+      .addCase(logoutUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.isLoading = false;
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      });
   },
 });
 
 const {
-  reducer: authReducer,
   actions: { logout },
+  reducer: authReducer,
 } = authSlice;
 
 export { authReducer as default };
