@@ -15,7 +15,7 @@ export const loginUser = createAsyncThunk('auth/loginUser', async (credentials, 
       return rejectWithValue('User account is inactive or banned');
     }
 
-    return data; // Should include role and status in data
+    return data;
   } catch (error) {
     return rejectWithValue(error.response?.data || 'Login failed');
   }
@@ -36,7 +36,7 @@ export const registerUser = createAsyncThunk('auth/registerUser', async (userDet
     const response = await instance.post('api/v1/users/Register', {
       username: userDetails.username,
       password: userDetails.password,
-      email: userDetails.email,
+      phone: userDetails.phone,
     });
     const { data } = response;
     return data;
