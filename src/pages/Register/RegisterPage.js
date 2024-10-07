@@ -6,12 +6,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Container, TextField, Button, Card, CardContent, Typography, Box } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import useAxios from '@/hooks/useAxios';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser } from '../../redux/slice/authSlice';
 
 function RegisterPage() {
   const navigate = useNavigate();
-  const axios = useAxios();
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { isLoading, error } = useSelector((state) => state.auth);
 
   const INITIAL_FORM_STATE = {
     username: '',
@@ -26,21 +27,23 @@ function RegisterPage() {
   });
 
   const handleSubmitRegister = async (values) => {
-    console.log('Form submitted with values:', values);
-    try {
-      setIsLoading(true);
-      const response = await axios.post('/users/register', {
+    const resultAction = await dispatch(
+      registerUser({
         username: values.username,
         phone: values.phone,
         password: values.password,
-      });
+      }),
+    );
 
-      toast.success('Tài khoản đã được đăng ký thành công. Hãy đăng nhập để tiếp tục');
+    if (registerUser.fulfilled.match(resultAction)) {
+      toast.success('Your account has been successfully registered. Please log in to continue.');
       navigate('/login');
-    } catch (error) {
-      toast.error('Tài khoản không thể đăng ký xin hãy kiểm tra lại thông tin');
-    } finally {
-      setIsLoading(false);
+    } else {
+      if (resultAction.payload) {
+        toast.error(resultAction.payload);
+      } else {
+        toast.error('Account registration failed. Please check your information and try again.');
+      }
     }
   };
 
