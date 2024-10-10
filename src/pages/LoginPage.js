@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Container, TextField, Button, Typography, Box } from '@mui/material';
+import { Container, TextField, Button, Typography, Box, Card, CardContent } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser, logoutUser } from '../redux/slice/authSlice';
@@ -30,6 +30,7 @@ function LoginPage() {
   };
 
   const handleSubmitLogin = async (values) => {
+    console.log('Login', values);
     dispatch(loginUser(values));
   };
 
@@ -58,72 +59,90 @@ function LoginPage() {
   }, [isAuthenticated, navigate, user]);
 
   return (
-    <Container maxWidth="sm">
-      <Box mt={5} p={3}>
-        <Typography variant="h4" mb={5} fontWeight="bold">
-          Log In
-        </Typography>
-        {!isAuthenticated ? (
-          <Formik
-            initialValues={INITIAL_FORM_STATE}
-            validationSchema={FORM_VALIDATION}
-            onSubmit={handleSubmitLogin}
-            validateOnChange={true}
-            validateOnBlur={true}
-          >
-            {({ values, handleChange, isSubmitting }) => (
-              <Form>
-                <Field name="username">
-                  {({ field }) => (
-                    <TextField fullWidth margin="normal" label="Username" variant="outlined" {...field} />
-                  )}
-                </Field>
-                <ErrorMessage name="username" component="div" className="text-danger" />
+    <Container maxWidth={false} disableGutters>
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#F26E3F',
+          padding: 0,
+        }}
+      >
+        <Card
+          sx={{
+            padding: '3rem',
+            maxWidth: '500px',
+            width: '100%',
+            background: 'white',
+            backdropFilter: 'blur(10px)',
+          }}
+        >
+          <CardContent>
+            <Typography variant="h4" mb={5} fontWeight="bold" align="center">
+              Log In
+            </Typography>
 
-                <Field name="password">
-                  {({ field }) => (
-                    <TextField
+            {!isAuthenticated ? (
+              <Formik
+                initialValues={INITIAL_FORM_STATE}
+                validationSchema={FORM_VALIDATION}
+                onSubmit={handleSubmitLogin}
+                validateOnChange={true}
+                validateOnBlur={true}
+              >
+                {({ isSubmitting }) => (
+                  <Form>
+                    <Field name="username">
+                      {({ field }) => <TextField fullWidth margin="normal" label="Username" {...field} />}
+                    </Field>
+                    <ErrorMessage name="username" component="div" className="text-danger" />
+
+                    <Field name="password">
+                      {({ field }) => (
+                        <TextField
+                          fullWidth
+                          margin="normal"
+                          label="Password"
+                          type={showPassword ? 'text' : 'password'}
+                          {...field}
+                        />
+                      )}
+                    </Field>
+                    <ErrorMessage name="password" component="div" className="text-danger" />
+
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Link to="/forgot-password">Forgot password?</Link>
+                      <Typography onClick={handleClick} sx={{ cursor: 'pointer' }} color="primary">
+                        {showPassword ? 'Hide Password' : 'Show Password'}
+                      </Typography>
+                    </Box>
+
+                    <Button
                       fullWidth
-                      margin="normal"
-                      label="Password"
-                      variant="outlined"
-                      type={showPassword ? 'text' : 'password'}
-                      {...field}
-                    />
-                  )}
-                </Field>
-                <ErrorMessage name="password" component="div" className="text-danger" />
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      disabled={isLoading || isSubmitting}
+                      sx={{ mt: 3 }}
+                    >
+                      {isLoading ? 'Loading...' : 'Log In'}
+                    </Button>
 
-                <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
-                  <Link to="/forgot-password">Forgot password?</Link>
-                  <Typography onClick={handleClick} sx={{ cursor: 'pointer' }} color="primary">
-                    {showPassword ? 'Hide Password' : 'Show Password'}
-                  </Typography>
-                </Box>
+                    <Box textAlign="center" mt={3}>
+                      <Typography>
+                        Not a member? <Link to="/register">Sign Up</Link>
+                      </Typography>
+                    </Box>
 
-                <Button
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  disabled={isLoading || isSubmitting}
-                  sx={{ mt: 3 }}
-                >
-                  {isLoading ? 'Loading...' : 'Log In'}
-                </Button>
-
-                <Box textAlign="center" mt={3}>
-                  <Typography>
-                    Not a member? <Link to="/register">Sign Up</Link>
-                  </Typography>
-                </Box>
-
-                <ToastContainer position="top-right" autoClose={3000} />
-              </Form>
-            )}
-          </Formik>
-        ) : null}{' '}
-        {/* No logout or welcome message */}
+                    <ToastContainer position="top-right" autoClose={3000} />
+                  </Form>
+                )}
+              </Formik>
+            ) : null}
+          </CardContent>
+        </Card>
       </Box>
     </Container>
   );
