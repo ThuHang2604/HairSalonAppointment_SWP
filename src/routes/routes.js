@@ -7,8 +7,9 @@ import ServicePage from '@/pages/ServicePage';
 import ServiceDetail from '@/pages/ServiceDetail';
 import BookingPage from '@/pages/BookingPage';
 import PaymentPage from '@/pages/PaymentPage';
-import ServiceList from '@/pages/Manager/ServiceListPage';
-
+import ServiceList from '@/pages/Manager/ServiceList';
+import ProfilePage from '@/pages/UserProfile/Profile';
+import SubscriptionsPage from '@/pages/UserProfile/Subscriptions';
 const publicRoutes = [
   {
     title: 'Home',
@@ -44,6 +45,16 @@ const publicRoutes = [
     title: 'BookingPage',
     path: '/booking-page',
     component: BookingPage,
+  },
+  {
+    title: 'Profile',
+    path: '/profile',
+    component: ProfilePage,
+  },
+  {
+    title: 'Subscriptions',
+    path: '/subscriptions',
+    component: SubscriptionsPage,
   },
 ];
 
