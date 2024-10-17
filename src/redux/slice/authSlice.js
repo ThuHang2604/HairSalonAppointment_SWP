@@ -1,21 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import instance from '../axiosCustom';
 import { setUserAuthToken } from '../authServices';
+import { jwtDecode } from 'jwt-decode';
 
+// Existing login, logout, and register thunks
 export const loginUser = createAsyncThunk('auth/loginUser', async (credentials, { rejectWithValue }) => {
   try {
     const response = await instance.post('api/v1/users/Login', {
       username: credentials.username,
       password: credentials.password,
-      role: credentials.role,
     });
-    const { data } = response;
-    console.log('data role:', data);
-    if (data.status !== 1) {
-      return rejectWithValue('User account is inactive or banned');
-    }
-
-    return data;
+    const { data: token } = response;
+    console.log('data token:', token);
+    return token;
   } catch (error) {
     return rejectWithValue(error.response?.data || 'Login failed');
   }
@@ -24,7 +21,6 @@ export const loginUser = createAsyncThunk('auth/loginUser', async (credentials, 
 export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, { rejectWithValue }) => {
   try {
     setUserAuthToken(null);
-
     return true;
   } catch (error) {
     return rejectWithValue(error.response?.data || 'Logout failed');
@@ -45,7 +41,42 @@ export const registerUser = createAsyncThunk('auth/registerUser', async (userDet
   }
 });
 
-// Khởi tạo slice
+export const getUserProfile = createAsyncThunk('auth/getUserProfile', async (_, { getState, rejectWithValue }) => {
+  try {
+    const { token } = getState().auth; // Lấy token từ state auth
+    if (!token) throw new Error('No token found');
+
+    const response = await instance.get('/api/v1/userprofile/current', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data && response.data.data) {
+      return response.data.data; // Trả về data nếu thành công
+    } else {
+      throw new Error('Data field is missing in the API response');
+    }
+  } catch (error) {
+    return rejectWithValue(error.response?.data || 'Failed to fetch user profile');
+  }
+});
+
+export const updateCurrentProfile = createAsyncThunk(
+  'auth/updateCurrentProfile',
+  async (profileData, { rejectWithValue }) => {
+    try {
+      const response = await instance.post('/api/v1/userprofile/updateCurrentProfile', profileData);
+      const { data } = response;
+      console.log('data update:', data);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Update profile failed');
+    }
+  },
+);
+
+// Slice
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -63,30 +94,37 @@ const authSlice = createSlice({
       state.error = null;
       setUserAuthToken(null);
     },
+    setUser: (state, action) => {
+      const decodedUser = jwtDecode(action.payload);
+      state.user = { role: decodedUser.role };
+      state.token = action.payload;
+      state.isAuthenticated = true;
+    },
   },
+
   extraReducers: (builder) => {
     builder
+      // Login user cases
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
-
-        // Set the user fields from the response
-        const { userId, userName, password, phone, status, role } = action.payload;
-
-        // Store the user data in the state
-        state.user = { userId, userName, password, phone, status, role };
+        const token = action.payload;
+        const decodedUser = jwtDecode(token);
+        state.user = { role: decodedUser.role };
+        state.token = token;
         state.isAuthenticated = true;
         state.error = null;
+        setUserAuthToken(token);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-      });
+      })
 
-    builder
+      // Register user cases
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -97,9 +135,9 @@ const authSlice = createSlice({
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-      });
+      })
 
-    builder
+      // Logout user cases
       .addCase(logoutUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -113,13 +151,42 @@ const authSlice = createSlice({
       .addCase(logoutUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+
+      // Fetch user profile cases
+      .addCase(getUserProfile.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getUserProfile.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload; // Assuming the API returns the user profile as the payload
+        state.error = null;
+      })
+      .addCase(getUserProfile.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateCurrentProfile.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateCurrentProfile.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload; // Cập nhật thông tin người dùng
+        state.error = null;
+      })
+      .addCase(updateCurrentProfile.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       });
   },
 });
 
+// Export actions and reducer
 const {
-  actions: { logout },
+  actions: { logout, setUser },
   reducer: authReducer,
 } = authSlice;
 
-export { authReducer as default };
+export { authReducer as default, setUser };
