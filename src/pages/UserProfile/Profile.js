@@ -24,7 +24,7 @@ const ProfilePage = () => {
   });
 
   const [previewImage, setPreviewImage] = useState('');
-  const [loading, setLoading] = useState(false); // State cho loading
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     dispatch(getUserProfileCurrent());
