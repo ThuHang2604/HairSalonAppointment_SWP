@@ -2,15 +2,46 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Box, Typography, TextField, Select, MenuItem, Divider } from '@mui/material';
 import { getScheduleList } from '@/api/ScheduleApi';
 import { createBooking } from '@/api/BookingApi';
+import { getUserProfileCurrent } from '@/redux/slice/userProfileSlice';
+import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import './styles.css';
 
 const CartModal = ({ open, onClose, bookingData }) => {
+  const dispatch = useDispatch();
   const [scheduleList, setScheduleList] = useState([]);
   const [userName, setUserName] = useState('');
   const [phone, setPhone] = useState('');
   const [schedule, setSchedule] = useState('');
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [loadingSchedules, setLoadingSchedules] = useState(true);
 
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const actionResult = await dispatch(getUserProfileCurrent());
+        if (getUserProfileCurrent.fulfilled.match(actionResult)) {
+          const userData = actionResult.payload;
+          setUserName(userData.fullName);
+          setPhone(userData.phone);
+        } else {
+          console.error('Failed to fetch user profile:', actionResult.error.message);
+          toast.error('Unable to load user profile. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        toast.error('Error fetching user profile.');
+      } finally {
+        setLoadingUser(false);
+      }
+    };
+
+    if (open) {
+      fetchUserProfile();
+    }
+  }, [dispatch, open]);
+
+  // Fetch lịch trình từ API
   useEffect(() => {
     const fetchSchedules = async () => {
       try {
@@ -18,11 +49,16 @@ const CartModal = ({ open, onClose, bookingData }) => {
         setScheduleList(schedules.data);
       } catch (error) {
         console.error('Failed to fetch schedule list:', error);
+        toast.error('Unable to load schedules. Please try again.');
+      } finally {
+        setLoadingSchedules(false);
       }
     };
 
-    fetchSchedules();
-  }, []);
+    if (open) {
+      fetchSchedules();
+    }
+  }, [open]);
 
   const handleBookNow = async () => {
     const dataToSave = {
@@ -46,7 +82,19 @@ const CartModal = ({ open, onClose, bookingData }) => {
   };
 
   if (!bookingData || !bookingData.serviceDetail) {
-    return null; // Không render gì nếu không có bookingData
+    return null;
+  }
+
+  if (loadingUser || loadingSchedules) {
+    return (
+      <Modal open={open} onClose={onClose} closeAfterTransition>
+        <Box className="modal-box">
+          <Typography variant="h6" align="center">
+            Loading...
+          </Typography>
+        </Box>
+      </Modal>
+    );
   }
 
   return (
