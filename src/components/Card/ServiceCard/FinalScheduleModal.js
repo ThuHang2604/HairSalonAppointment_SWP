@@ -13,96 +13,58 @@ import {
 } from '@mui/material';
 import { getUserProfileCurrent } from '@/redux/slice/userProfileSlice';
 import { getScheduleList } from '@/api/ScheduleApi';
-import { createBooking } from '@/api/BookingApi';
+// import { createBooking } from '@/api/BookingApi';
+import { createBooking } from '@/redux/slice/userBooking';
 import { toast } from 'react-toastify';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const FinalScheduleModal = ({ open, onClose, bookingData, onBack }) => {
-  const [userName, setUserName] = useState('');
-  const [phone, setPhone] = useState('');
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedule, setSelectedSchedule] = useState('');
   const dispatch = useDispatch();
-  const [loadingUser, setLoadingUser] = useState(true);
-  const [loadingSchedules, setLoadingSchedules] = useState(true);
-
+  const { user } = useSelector((state) => state.userProfile); // Lấy thông tin user từ Redux
+  console.log('customer Id', user.userProfileId);
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const actionResult = await dispatch(getUserProfileCurrent());
-        if (getUserProfileCurrent.fulfilled.match(actionResult)) {
-          const userData = actionResult.payload;
-          setUserName(userData.fullName);
-          setPhone(userData.phone);
-        } else {
-          console.error('Failed to fetch user profile:', actionResult.error.message);
-          toast.error('Unable to load user profile. Please try again.');
-        }
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
-        toast.error('Error fetching user profile.');
-      } finally {
-        setLoadingUser(false);
-      }
-    };
-
     if (open) {
-      fetchUserProfile();
+      dispatch(getUserProfileCurrent()); // Lấy profile khi modal mở
+      fetchSchedules(); // Lấy danh sách schedule
     }
   }, [dispatch, open]);
 
-  // Fetch schedules from API
-  useEffect(() => {
-    const fetchSchedules = async () => {
-      try {
-        const schedules = await getScheduleList();
-        setSchedules(schedules.data);
-      } catch (error) {
-        console.error('Failed to fetch schedule list:', error);
-        toast.error('Unable to load schedules. Please try again.');
-      } finally {
-        setLoadingSchedules(false);
-      }
-    };
-
-    if (open) {
-      fetchSchedules();
-    }
-  }, [open]);
-
-  const handleBookNow = async () => {
-    const dataToSave = {
-      userName,
-      phone,
-      voucherId: null,
-      scheduleId: selectedSchedule,
-      serviceId: bookingData.map((item) => item.service.serviceId),
-      stylistId: bookingData.map((item) => item.stylist.stylistId),
-    };
-
+  const fetchSchedules = async () => {
     try {
-      await createBooking(dataToSave);
-      toast.success(
-        'Your booking request has been sent successfully. Please wait for appointment confirmation from Salon.',
-      );
-      onClose(); // Close the modal on success
+      const schedules = await getScheduleList();
+      setSchedules(schedules.data);
     } catch (error) {
-      console.error('Booking Error:', error);
-      toast.error('Failed to send booking request. Please try again.');
+      console.error('Failed to fetch schedule list:', error);
+      toast.error('Unable to load schedules. Please try again.');
     }
   };
 
-  if (loadingUser || loadingSchedules) {
-    return (
-      <Modal open={open} onClose={onClose} closeAfterTransition>
-        <Box className="modal-box">
-          <Typography variant="h6" align="center">
-            Loading...
-          </Typography>
-        </Box>
-      </Modal>
-    );
-  }
+  const handleBookNow = async () => {
+    // Lấy user từ Redux
+    const customerId = user?.userProfileId; // Lấy customerId từ userProfileId
+
+    const newBooking = {
+      scheduleId: selectedSchedule, // ID của lịch hẹn
+      customerId: customerId, // Gán customerId từ userProfile
+      serviceId: bookingData.map((item) => item.service.serviceId), // Lấy danh sách serviceId
+      stylistId: bookingData.map((item) => item.stylist.stylistId), // Lấy danh sách stylistId
+    };
+
+    try {
+      const resultAction = await dispatch(createBooking(newBooking));
+      if (createBooking.fulfilled.match(resultAction)) {
+        toast.success('Booking created successfully!');
+        onClose(); // Đóng modal nếu thành công
+      } else {
+        throw new Error(resultAction.payload || 'Unknown error.');
+      }
+    } catch (error) {
+      console.error('Booking Error:', error);
+      toast.error('Booking failed. Please try again.');
+    }
+  };
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -111,11 +73,9 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onBack }) => {
           Confirm Your Appointment
         </Typography>
 
-        {/* User Name and Phone */}
-        <TextField label="Name" value={userName} fullWidth margin="normal" disabled />
-        <TextField label="Phone" value={phone} fullWidth margin="normal" disabled />
+        <TextField label="Name" value={user?.fullName || ''} fullWidth margin="normal" disabled />
+        <TextField label="Phone" value={user?.phone || ''} fullWidth margin="normal" disabled />
 
-        {/* Selected Services */}
         <Typography variant="h6" sx={{ marginTop: 2, marginBottom: 1 }}>
           Selected Services
         </Typography>
@@ -130,7 +90,6 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onBack }) => {
           ))}
         </List>
 
-        {/* Schedule Selection */}
         <Select
           value={selectedSchedule}
           onChange={(e) => setSelectedSchedule(e.target.value)}
@@ -143,14 +102,11 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onBack }) => {
           </MenuItem>
           {schedules.map((schedule) => (
             <MenuItem key={schedule.scheduleId} value={schedule.scheduleId}>
-              {`From ${schedule.startTime} to ${schedule.endTime} on ${new Date(
-                schedule.startDate,
-              ).toLocaleDateString()}`}
+              {`From ${schedule.startTime} to ${schedule.endTime} on ${new Date(schedule.startDate).toLocaleDateString()}`}
             </MenuItem>
           ))}
         </Select>
 
-        {/* Buttons: Back and Confirm */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
           <Button variant="text" color="primary" onClick={onBack}>
             Back

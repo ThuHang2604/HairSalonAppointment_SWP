@@ -72,9 +72,20 @@ const ProfilePage = () => {
   };
 
   const handleSubmit = async () => {
+    const profileData = {
+      userProfileId: user.userProfileId, // Đảm bảo truyền userProfileId khi cập nhật
+      fullName: formData.fullName,
+      email: formData.email,
+      gender: formData.gender,
+      address: formData.address,
+      dateOfBirth: formData.dateOfBirth,
+      phone: formData.phone,
+      imageLink: formData.imageLink,
+    };
+
     try {
       setLoading(true);
-      const actionResult = await dispatch(updateCurrentProfile(formData));
+      const actionResult = await dispatch(updateCurrentProfile(profileData));
 
       if (updateCurrentProfile.fulfilled.match(actionResult)) {
         Swal.fire({
@@ -82,7 +93,7 @@ const ProfilePage = () => {
           title: 'Success',
           text: 'Profile updated successfully!',
         });
-        dispatch(getUserProfileCurrent());
+        dispatch(getUserProfileCurrent()); // Cập nhật lại thông tin user sau khi cập nhật
       } else {
         Swal.fire({
           icon: 'error',

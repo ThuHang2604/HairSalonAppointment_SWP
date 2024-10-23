@@ -9,6 +9,7 @@ export const getUserProfileCurrent = createAsyncThunk(
     try {
       const response = await instance.get('/api/v1/userprofile/current');
       console.log('User profile response:', response.data);
+      // console.log('User profile status:', response.data.status);
 
       if (response.data && response.data.data) {
         return response.data.data;

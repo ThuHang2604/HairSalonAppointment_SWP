@@ -3,6 +3,7 @@ import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, 
 import storage from 'redux-persist/lib/storage';
 import authReducer from './slice/authSlice';
 import userProfileReducer from './slice/userProfileSlice';
+import bookingReducer from './slice/userBooking';
 const persistConfig = {
   key: 'root',
   storage,
@@ -13,6 +14,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authReducer,
   userProfile: userProfileReducer,
+  booking: bookingReducer,
 });
 
 const persistedAuthReducer = persistReducer(persistConfig, rootReducer);
