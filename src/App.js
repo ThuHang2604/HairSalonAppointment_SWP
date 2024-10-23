@@ -1,10 +1,13 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { publicRoutes, adminRoutes } from './routes/routes';
 import './App.css';
 
 import DefaultLayout from './layout/DefaultLayout';
 import AdminLayout from './layout/AdminLayout';
-
+import ProfileLayout from './layout/ProfileLayout/ProfileLayout';
+import SubscriptionPage from './pages/UserProfile/Subscriptions';
+import ProfilePage from './pages/UserProfile/Profile';
+import UserBooking from './pages/UserProfile/UserBooking';
 function App() {
   return (
     <div className="App">
@@ -27,6 +30,14 @@ function App() {
                 />
               );
             })}
+          </Route>
+
+          {/* Profile Routes */}
+          <Route path="/user" element={<ProfileLayout />}>
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="subscriptions" element={<SubscriptionPage />} />
+            <Route path="booking" element={<UserBooking />} />
+            <Route index element={<Navigate to="profile" replace />} />
           </Route>
 
           {/* Admin routes */}

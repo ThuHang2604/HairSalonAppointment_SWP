@@ -9,6 +9,7 @@ import PaymentPage from '@/pages/PaymentPage';
 import ServiceList from '@/pages/Manager/ServiceListPage';
 import ProfilePage from '@/pages/UserProfile/Profile';
 import SubscriptionsPage from '@/pages/UserProfile/Subscriptions';
+import UserBooking from '@/pages/UserProfile/UserBooking';
 const publicRoutes = [
   {
     title: 'Home',
@@ -49,6 +50,11 @@ const publicRoutes = [
     title: 'Subscriptions',
     path: '/subscriptions',
     component: SubscriptionsPage,
+  },
+  {
+    title: 'UserBooking',
+    path: '/user-booking',
+    component: UserBooking,
   },
 ];
 

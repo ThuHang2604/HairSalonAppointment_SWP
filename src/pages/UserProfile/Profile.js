@@ -2,17 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Container, Typography, TextField, Button, Backdrop, CircularProgress } from '@mui/material';
 import Swal from 'sweetalert2'; // Import SweetAlert2
-import ProfileSidebar from './ProSidebar';
-import { getUserProfileCurrent, updateCurrentProfile } from '@/redux/slice/userProfileSlice';
-import { loginUser } from '@/redux/slice/authSlice';
+import ProfileSidebar from './ProSidebar'; // Import sidebar component
+import { getUserProfileCurrent, updateCurrentProfile, setPreviewImage } from '@/redux/slice/userProfileSlice';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { imageDb } from '@/components/FirebaseImage/Config';
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
-  const { user, isLoading, error } = useSelector((state) => state.userProfile);
-  const { role } = useSelector((state) => state.auth);
-  console.log('role là :', role);
+  const [selectedTab, setSelectedTab] = useState('profile');
+  const { user, isLoading } = useSelector((state) => state.userProfile);
   const [formData, setFormData] = useState({
     imageLink: '',
     fullName: '',
@@ -22,13 +20,11 @@ const ProfilePage = () => {
     dateOfBirth: '',
     phone: '',
   });
-
-  const [previewImage, setPreviewImage] = useState('');
+  // const [previewImage, setPreviewImage] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     dispatch(getUserProfileCurrent());
-    dispatch(loginUser());
   }, [dispatch]);
 
   useEffect(() => {
@@ -50,7 +46,6 @@ const ProfilePage = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleImageUpload = (e) => {
     const selectedImage = e.target.files[0];
     if (!selectedImage) return;
@@ -59,11 +54,12 @@ const ProfilePage = () => {
     const uploadTask = uploadBytesResumable(storageRef, selectedImage);
 
     const imagePreviewUrl = URL.createObjectURL(selectedImage);
-    setPreviewImage(imagePreviewUrl);
+    setPreviewImage(imagePreviewUrl); // Set local preview in ProfilePage
+    dispatch(setPreviewImage(imagePreviewUrl)); // Dispatch to Redux store
 
     uploadTask.on(
       'state_changed',
-      (snapshot) => {},
+      () => {},
       (error) => {
         console.error('Image upload failed:', error);
       },
@@ -88,19 +84,11 @@ const ProfilePage = () => {
         });
         dispatch(getUserProfileCurrent());
       } else {
-        if (actionResult.error.message.includes('401')) {
-          Swal.fire({
-            icon: 'warning',
-            title: 'Unauthorized',
-            text: 'Your session has expired. Please log in again.',
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Update failed: ' + actionResult.error.message,
-          });
-        }
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Update failed: ' + actionResult.error.message,
+        });
       }
     } catch (error) {
       Swal.fire({
@@ -121,22 +109,30 @@ const ProfilePage = () => {
         <CircularProgress color="inherit" />
       </Backdrop>
 
-      <Box sx={{ display: 'flex', gap: '30px', flexDirection: { xs: 'column', md: 'row' } }}>
-        <ProfileSidebar user={user} previewImage={previewImage} role={role} />
+      <Box
+        sx={{
+          display: 'flex',
+          gap: '30px',
+          flexDirection: { xs: 'column', md: 'row' },
+          backgroundColor: '#fff',
+        }}
+      >
+        {/* Sidebar */}
 
+        {/* Main Content */}
         <Box
           sx={{
             border: '3px solid black',
             borderRadius: 2,
-            padding: 3,
-            width: { xs: '100%', md: '70%' },
+            padding: 4,
+            width: '728px',
             textAlign: 'left',
           }}
         >
-          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#f26e3f', fontFamily: 'Monoton, Fantasy' }}>
+          <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ fontFamily: 'Monoton, Fantasy' }}>
             ACCOUNT
           </Typography>
-          <Typography variant="body2" mb={2}>
+          <Typography variant="body1" gutterBottom>
             View and edit your personal info below.
           </Typography>
 
