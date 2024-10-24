@@ -55,12 +55,12 @@ const Navbar = () => {
           >
             SERVICES
           </Button>
-          {/* <Button
+          <Button
             onClick={handleLogout}
             sx={{ color: 'black', fontSize: '16px', letterSpacing: '1.5px', fontWeight: 'bold', textTransform: 'none' }}
           >
             Log out
-          </Button> */}
+          </Button>
         </Box>
 
         {/* User Account & Cart */}
@@ -111,7 +111,7 @@ const Navbar = () => {
                   horizontal: 'right',
                 }}
               >
-                <MenuItem component={Link} to="/profile" onClick={handleClose}>
+                <MenuItem component={Link} to="/user" onClick={handleClose}>
                   Profile
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>Log Out</MenuItem>

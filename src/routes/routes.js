@@ -9,6 +9,7 @@ import PaymentPage from '@/pages/PaymentPage';
 import ServiceList from '@/pages/Stylist/ServiceListPage';
 import ProfilePage from '@/pages/UserProfile/Profile';
 import SubscriptionsPage from '@/pages/UserProfile/Subscriptions';
+import UserBooking from '@/pages/UserProfile/UserBooking';
 import ReportListPage from '@/pages/Stylist/ReportListPage';
 
 const publicRoutes = [
@@ -51,6 +52,11 @@ const publicRoutes = [
     title: 'Subscriptions',
     path: '/subscriptions',
     component: SubscriptionsPage,
+  },
+  {
+    title: 'UserBooking',
+    path: '/user-booking',
+    component: UserBooking,
   },
 ];
 
