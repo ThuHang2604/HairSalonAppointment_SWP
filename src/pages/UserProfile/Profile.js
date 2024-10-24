@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Container, Typography, TextField, Button, Backdrop, CircularProgress } from '@mui/material';
-import Swal from 'sweetalert2'; // Import SweetAlert2
-import ProfileSidebar from './ProSidebar'; // Import sidebar component
+import Swal from 'sweetalert2'; // SweetAlert2 for notifications
+import ProfileSidebar from './ProSidebar'; // Sidebar component
 import { getUserProfileCurrent, updateCurrentProfile, setPreviewImage } from '@/redux/slice/userProfileSlice';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { imageDb } from '@/components/FirebaseImage/Config';
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
-  const [selectedTab, setSelectedTab] = useState('profile');
-  const { user, isLoading } = useSelector((state) => state.userProfile);
+  const { user, isLoading, previewImage } = useSelector((state) => state.userProfile);
+
   const [formData, setFormData] = useState({
     imageLink: '',
     fullName: '',
@@ -20,13 +20,15 @@ const ProfilePage = () => {
     dateOfBirth: '',
     phone: '',
   });
-  // const [previewImage, setPreviewImage] = useState('');
+
   const [loading, setLoading] = useState(false);
 
+  // Fetch user profile on component mount
   useEffect(() => {
     dispatch(getUserProfileCurrent());
   }, [dispatch]);
 
+  // Update form data when user profile changes
   useEffect(() => {
     if (user) {
       setFormData({
@@ -38,9 +40,9 @@ const ProfilePage = () => {
         dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : '',
         phone: user.phone || '',
       });
-      setPreviewImage(user.imageLink || '');
+      dispatch(setPreviewImage(user.imageLink || '')); // Update preview image
     }
-  }, [user]);
+  }, [user, dispatch]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,18 +56,18 @@ const ProfilePage = () => {
     const uploadTask = uploadBytesResumable(storageRef, selectedImage);
 
     const imagePreviewUrl = URL.createObjectURL(selectedImage);
-    setPreviewImage(imagePreviewUrl); // Set local preview in ProfilePage
-    dispatch(setPreviewImage(imagePreviewUrl)); // Dispatch to Redux store
+    dispatch(setPreviewImage(imagePreviewUrl)); // Immediately set the preview image in Redux
 
     uploadTask.on(
       'state_changed',
-      () => {},
+      null,
       (error) => {
         console.error('Image upload failed:', error);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setFormData((prev) => ({ ...prev, imageLink: downloadURL }));
+          dispatch(setPreviewImage(downloadURL)); // Update Redux with final image URL
         });
       },
     );
@@ -73,14 +75,8 @@ const ProfilePage = () => {
 
   const handleSubmit = async () => {
     const profileData = {
-      userProfileId: user.userProfileId, // Đảm bảo truyền userProfileId khi cập nhật
-      fullName: formData.fullName,
-      email: formData.email,
-      gender: formData.gender,
-      address: formData.address,
-      dateOfBirth: formData.dateOfBirth,
-      phone: formData.phone,
-      imageLink: formData.imageLink,
+      userProfileId: user.userProfileId, // Include userProfileId for update
+      ...formData,
     };
 
     try {
@@ -93,7 +89,7 @@ const ProfilePage = () => {
           title: 'Success',
           text: 'Profile updated successfully!',
         });
-        dispatch(getUserProfileCurrent()); // Cập nhật lại thông tin user sau khi cập nhật
+        dispatch(getUserProfileCurrent()); // Refresh user profile
       } else {
         Swal.fire({
           icon: 'error',
@@ -120,17 +116,7 @@ const ProfilePage = () => {
         <CircularProgress color="inherit" />
       </Backdrop>
 
-      <Box
-        sx={{
-          display: 'flex',
-          gap: '30px',
-          flexDirection: { xs: 'column', md: 'row' },
-          backgroundColor: '#fff',
-        }}
-      >
-        {/* Sidebar */}
-
-        {/* Main Content */}
+      <Box sx={{ display: 'flex', gap: '30px', flexDirection: { xs: 'column', md: 'row' } }}>
         <Box
           sx={{
             border: '3px solid black',
@@ -140,13 +126,14 @@ const ProfilePage = () => {
             textAlign: 'left',
           }}
         >
-          <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ fontFamily: 'Monoton, Fantasy' }}>
+          <Typography variant="h4" fontWeight="bold" gutterBottom>
             ACCOUNT
           </Typography>
           <Typography variant="body1" gutterBottom>
-            View and edit your personal info below.
+            View and edit your personal information below.
           </Typography>
 
+          {/* Form Fields */}
           <Box sx={{ display: 'flex', gap: '20px', flexDirection: { xs: 'column', sm: 'row' }, mb: 2 }}>
             <TextField
               fullWidth

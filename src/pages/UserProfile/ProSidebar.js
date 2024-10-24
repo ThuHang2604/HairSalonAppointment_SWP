@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Avatar, Typography, Button, Backdrop, CircularProgress } from '@mui/material';
+import React, { useEffect } from 'react';
+import { Box, Avatar, Typography, Button } from '@mui/material';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '@/redux/slice/authSlice';
 import { getUserProfileCurrent } from '@/redux/slice/userProfileSlice';
+
 const ProfileSidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
