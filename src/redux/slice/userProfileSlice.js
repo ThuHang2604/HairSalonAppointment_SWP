@@ -111,6 +111,7 @@ const userProfileSlice = createSlice({
       .addCase(getUserProfileCurrent.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+        state.previewImage = action.payload.imageLink;
       })
 
       // Get User Profile By ID

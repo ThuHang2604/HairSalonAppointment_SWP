@@ -8,6 +8,7 @@ import ProfileLayout from './layout/ProfileLayout/ProfileLayout';
 import SubscriptionPage from './pages/UserProfile/Subscriptions';
 import ProfilePage from './pages/UserProfile/Profile';
 import UserBooking from './pages/UserProfile/UserBooking';
+import BookingHistoryPage from './pages/UserProfile/Booking/BookingHistoryPage';
 function App() {
   return (
     <div className="App">
@@ -36,7 +37,7 @@ function App() {
           <Route path="/user" element={<ProfileLayout />}>
             <Route path="profile" element={<ProfilePage />} />
             <Route path="subscriptions" element={<SubscriptionPage />} />
-            <Route path="booking" element={<UserBooking />} />
+            <Route path="booking" element={<BookingHistoryPage />} />
             <Route index element={<Navigate to="profile" replace />} />
           </Route>
 
