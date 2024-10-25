@@ -11,6 +11,7 @@ import ProfilePage from '@/pages/UserProfile/Profile';
 import SubscriptionsPage from '@/pages/UserProfile/Subscriptions';
 import UserBooking from '@/pages/UserProfile/UserBooking';
 import ReportListPage from '@/pages/Stylist/ReportListPage';
+import BookingListPage from '@/pages/Stylist/BookingListPage';
 
 const publicRoutes = [
   {
@@ -83,6 +84,11 @@ const adminRoutes = [
     title: 'Report List',
     path: '/report-list',
     component: ReportListPage,
+  },
+  {
+    title: 'Booking List',
+    path: '/booking-list',
+    component: BookingListPage,
   },
 ];
 
