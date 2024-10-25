@@ -23,7 +23,7 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onBack }) => {
   const [selectedSchedule, setSelectedSchedule] = useState('');
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.userProfile); // Lấy thông tin user từ Redux
-  console.log('customer Id', user.userProfileId);
+  console.log('customer Id', user?.userProfileId);
   useEffect(() => {
     if (open) {
       dispatch(getUserProfileCurrent()); // Lấy profile khi modal mở
