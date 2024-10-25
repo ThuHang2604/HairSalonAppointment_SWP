@@ -3,7 +3,7 @@ import { Container, Typography, Card, CardContent, CardMedia, Button, Grid } fro
 import BookingModal from '@/components/Modal/BookingModal/BookingModal2';
 import CartModal from '@/components/Modal/CartModal/CartModal';
 import FinalScheduleModal from '@/components/Card/ServiceCard/FinalScheduleModal';
-
+import { Hair } from '@/pages/home/img/hair.jpg';
 function ServiceCard({ serviceCard }) {
   const [modalOpen, setModalOpen] = useState(false); // Booking Modal
   const [cartModalOpen, setCartModalOpen] = useState(false); // Appointment Summary Modal
