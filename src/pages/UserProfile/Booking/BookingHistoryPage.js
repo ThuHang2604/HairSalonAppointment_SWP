@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const BookingHistoryPage = () => {
   const dispatch = useDispatch();
   const { bookingHistory, isLoading, error } = useSelector((state) => state.userProfile);
-
+  console.log('dảta la :', bookingHistory);
   const [page, setPage] = useState(1); // Current page for pagination
   const [pageSize] = useState(4); // Items per page (4 bookings)
   const [paginatedBookings, setPaginatedBookings] = useState([]); // Current page's bookings
@@ -66,8 +66,8 @@ const BookingHistoryPage = () => {
           </Typography>
           {/* Tabs: Upcoming and Past */}
           <Tabs value={tabValue} onChange={handleTabChange} sx={{ marginBottom: '20px' }}>
-            <Tab label="Upcoming" />
             <Tab label="Past" />
+            <Tab label="UpComing" />
           </Tabs>
 
           {/* Booking List for the Selected Tab */}
