@@ -15,15 +15,16 @@ import { getUserProfileCurrent } from '@/redux/slice/userProfileSlice';
 import { getScheduleList } from '@/api/ScheduleApi';
 // import { createBooking } from '@/api/BookingApi';
 import { createBooking } from '@/redux/slice/userBooking';
+
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 
-const FinalScheduleModal = ({ open, onClose, bookingData, onBack }) => {
+const FinalScheduleModal = ({ open, onClose, bookingData, onBack, voucherId }) => {
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedule, setSelectedSchedule] = useState('');
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.userProfile); // Lấy thông tin user từ Redux
-  console.log('customer Id', user?.userProfileId);
+  console.log('voucherId Id', voucherId);
   useEffect(() => {
     if (open) {
       dispatch(getUserProfileCurrent()); // Lấy profile khi modal mở
@@ -42,22 +43,23 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onBack }) => {
   };
 
   const handleBookNow = async () => {
-    // Lấy user từ Redux
-    const customerId = user?.userProfileId; // Lấy customerId từ userProfileId
+    const customerId = user?.userProfileId;
 
     const newBooking = {
-      scheduleId: selectedSchedule, // ID của lịch hẹn
-      customerId: customerId, // Gán customerId từ userProfile
-      serviceId: bookingData.map((item) => item.service.serviceId), // Lấy danh sách serviceId
-      stylistId: bookingData.map((item) => item.stylist.stylistId), // Lấy danh sách stylistId
+      scheduleId: selectedSchedule,
+      customerId,
+      serviceId: bookingData.map((item) => item.service.serviceId),
+      stylistId: bookingData.map((item) => item.stylist.stylistId),
+      voucherId: voucherId || null, // Include voucherId in booking request
     };
-
+    console.log('Booking Payload:', newBooking);
     try {
       const resultAction = await dispatch(createBooking(newBooking));
       if (createBooking.fulfilled.match(resultAction)) {
         toast.success('Booking created successfully!');
-        onClose(); // Đóng modal nếu thành công
+        onClose();
       } else {
+        console.error('API Response Error:', resultAction.payload);
         throw new Error(resultAction.payload || 'Unknown error.');
       }
     } catch (error) {
@@ -102,7 +104,9 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onBack }) => {
           </MenuItem>
           {schedules.map((schedule) => (
             <MenuItem key={schedule.scheduleId} value={schedule.scheduleId}>
-              {`From ${schedule.startTime} to ${schedule.endTime} on ${new Date(schedule.startDate).toLocaleDateString()}`}
+              {`From ${schedule.startTime} to ${schedule.endTime} on ${new Date(
+                schedule.startDate,
+              ).toLocaleDateString()}`}
             </MenuItem>
           ))}
         </Select>

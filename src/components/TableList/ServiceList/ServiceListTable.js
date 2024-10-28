@@ -92,12 +92,14 @@ function ServiceListTable({ serviceList = [] }) {
                 <StyledTableCell>{service.updateBy}</StyledTableCell>
                 <StyledTableCell>{new Date(service.updateDate).toLocaleString()}</StyledTableCell>
                 <StyledTableCell>
-                  <Button variant="contained" color="primary" size="small" style={{ marginRight: 10 }}>
-                    Update
-                  </Button>
-                  <Button variant="contained" color="error" size="small">
-                    Remove
-                  </Button>
+                  <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                    <Button variant="contained" color="primary" size="small" style={{ marginRight: 10 }}>
+                      Update
+                    </Button>
+                    <Button variant="contained" color="error" size="small">
+                      Remove
+                    </Button>
+                  </div>
                 </StyledTableCell>
               </StyledTableRow>
             ))

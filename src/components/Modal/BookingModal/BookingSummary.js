@@ -15,7 +15,7 @@ const BookingSummary = ({ selectedServices, onAddMore, onFinish, onRemoveService
       }}
     >
       <Typography variant="h5" align="center" gutterBottom>
-        Appointment Summary
+        Appointment Summary2
       </Typography>
       <Divider sx={{ mb: 2 }} />
 
